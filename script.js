@@ -23,6 +23,12 @@ var timeMoment = [
 
 $("#currentDay").text(today.format("LL"));
 
+function localStorage() {
+    localStorage.setItem('tasks', JSON.stringify(taskList));    
+}
+
+localStorage();
+
 for (var i = 0; i < timeMoment.length; i++) {
     $("<div>").attr(
         {
