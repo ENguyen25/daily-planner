@@ -23,12 +23,6 @@ var timeMoment = [
 
 $("#currentDay").text(today.format("LL"));
 
-function localStorage() {
-    localStorage.setItem('tasks', JSON.stringify(taskList));    
-}
-
-localStorage();
-
 for (var i = 0; i < timeMoment.length; i++) {
     $("<div>").attr(
         {
@@ -51,7 +45,7 @@ for (var i = 0; i < timeMoment.length; i++) {
 
     var savedTask = JSON.parse(localStorage.getItem("tasks"));
 
-    if (savedTask.length > 0) {
+    if (savedTask && savedTask.length > 0) {
         var renderTask = savedTask.filter(function(item) {
             return item.id == i;
         })
