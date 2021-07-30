@@ -44,16 +44,19 @@ for (var i = 0; i < timeMoment.length; i++) {
     }
 
     var savedTask = JSON.parse(localStorage.getItem("tasks"));
-    var renderTask = savedTask.filter(function(item) {
-        return item.id == i;
-    })
 
-    console.log(renderTask);
-
-    if (renderTask.length > 0) {
-        var value = renderTask[0].task;
-        console.log(value);
-        $(`#${timeMoment[i].time}`).find(".task-input").append(value);
+    if (savedTask.length > 0) {
+        var renderTask = savedTask.filter(function(item) {
+            return item.id == i;
+        })
+    
+        console.log(renderTask);
+    
+        if (renderTask.length > 0) {
+            var value = renderTask[0].task;
+            console.log(value);
+            $(`#${timeMoment[i].time}`).find(".task-input").append(value);
+        }
     }
 }
 
