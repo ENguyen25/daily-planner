@@ -3,6 +3,7 @@ var currentTime = moment().hour();
 var container = document.querySelector(".container");
 var timeBlock = document.querySelector(".time-block");
 var saveInput = document.querySelector(".task-input");
+
 var taskList = [];
 var timeMoment = [
     {time: '9am', current: 9},
@@ -23,44 +24,63 @@ var timeMoment = [
 
 $("#currentDay").text(today.format("LL"));
 
-for (var i = 0; i < timeMoment.length; i++) {
-    $("<div>").attr(
-        {
-            id: `${timeMoment[i].time}`,
-            class: "time-block row",
-            "data-id": [i],
-        }
-    ).appendTo(".container");
-    $("<p>").addClass("hour").text(`${timeMoment[i].time}`).appendTo(`#${timeMoment[i].time}`);
-    $("<textarea>").addClass("task-input").appendTo(`#${timeMoment[i].time}`);
-    $("<button>").addClass("saveBtn").appendTo(`#${timeMoment[i].time}`);
+renderTable();
 
-    if (timeMoment[i].current == currentTime) {
-        $(`#${timeMoment[i].time}`).find(".task-input").toggleClass("present");
-    } else if (timeMoment[i].current < currentTime) {
-        $(`#${timeMoment[i].time}`).find(".task-input").toggleClass("past");        
-    } else {
-        $(`#${timeMoment[i].time}`).find(".task-input").toggleClass("future");        
-    }
-
+// Retrieves tasks saved in local storage after refresh
+async function retrieveStorage(){
     var savedTask = JSON.parse(localStorage.getItem("tasks"));
 
-    if (savedTask && savedTask.length > 0) {
-        var renderTask = savedTask.filter(function(item) {
-            return item.id == i;
-        })
-    
-        console.log(renderTask);
-    
-        if (renderTask.length > 0) {
-            var value = renderTask[0].task;
-            console.log(value);
-            $(`#${timeMoment[i].time}`).find(".task-input").append(value);
+    if (savedTask != null) {
+        if (savedTask.length > 0) {
+            taskList = savedTask
         }
     }
+
+    return taskList
 }
 
+// Renders table
+async function renderTable(){
 
+    const retrievedTasks = await retrieveStorage();
+    
+    timeMoment.forEach(async (item, index) => {
+    
+        $("<div>").attr(
+            {
+                id: `${item.time}`,
+                class: "time-block row",
+                "data-id": `${index}`,
+            }
+        ).appendTo(".container");
+        $("<p>").addClass("hour").text(`${item.time}`).appendTo(`#${item.time}`);
+        $("<textarea>").addClass("task-input").appendTo(`#${item.time}`);
+        $("<button>").addClass("saveBtn").appendTo(`#${item.time}`);
+    
+        if (item.current == currentTime) {
+            $(`#${item.time}`).find(".task-input").toggleClass("present");
+        } else if (item.current < currentTime) {
+            $(`#${item.time}`).find(".task-input").toggleClass("past");        
+        } else {
+            $(`#${item.time}`).find(".task-input").toggleClass("future");        
+        }
+    
+        if (retrievedTasks && retrievedTasks.length > 0) {
+            // Renders tasks for corresponding time slot
+            var renderTask = retrievedTasks.filter(function(item) {
+                return item.id == index;
+            })
+            
+            // Updates tasks in time slot
+            if (renderTask.length > 0) {
+                var value = renderTask[renderTask.length-1].task;
+                $(`#${item.time}`).find(".task-input").append(value);
+            }
+        }
+    })
+}
+
+// Saves tasks to local storage with corresponding data-id
 container.addEventListener('click', function(event) {
     var onClick = event.target;
 
@@ -70,7 +90,6 @@ container.addEventListener('click', function(event) {
             task: onClick.previousSibling.value
         }
         taskList.push(newTask);
-        console.log(taskList);
         localStorage.setItem('tasks', JSON.stringify(taskList));
     } else {
         return;
